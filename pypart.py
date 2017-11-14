@@ -41,6 +41,7 @@ def parseParams(argv):
 
     if not (filename.endswith("csv") or filename.endswith("xlsx")):
         print("\nData file must be of type 'csv' or 'xlsx'.")
+        print("Args: ", argv)
         printUsage()
         exit(0)
 
@@ -152,14 +153,13 @@ def pypartToRpart(root, baseFilename, cpTable, where):
 
 
 #####
-# Main Function
+#   Run the whole process
 #####
-if __name__ == "__main__":
-    start_time = time.time()
-    if len(sys.argv) < 3:
+def pypart_run(args):
+    if len(args) < 3:
         printUsage()
         exit(0)
-    dataFilename, response, delayed = parseParams(sys.argv)
+    dataFilename, response, delayed = parseParams(args)
 
     outputFilename = splitext(dataFilename)[0] + ".tree"
     if delayed > 0:
@@ -168,6 +168,7 @@ if __name__ == "__main__":
     df = getDataFrameFromCSV(dataFilename)
     if not str(response) in df.columns:
         print("\nResponse variable not in data frame.")
+        print("Args: ", args)
         printUsage()
         exit(0)
 
@@ -209,5 +210,14 @@ if __name__ == "__main__":
     printTree(tree, outputFilename)
     pypartToRpart(tree, splitext(dataFilename)[0], cpTableHead, params.where)
 
+    return cpTableHead
+
+
+#####
+# Main Function
+#####
+if __name__ == "__main__":
+    start_time = time.time()
+    pypart_run(sys.argv)
     print("Time elapsed:", str(time.time() - start_time), "seconds.")
     print("Done.")
