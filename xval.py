@@ -22,6 +22,7 @@ def xval(cpTableHead, xGrp, dataframe, params):
         cpList.append(math.sqrt(cpTemp.cp * cpTemp.forward.cp))
         cpTemp = cpTemp.forward
 
+    prevDelayed = params.delayed
     if len(dataframe) > 500 or len(dataframe.columns) > 8:
         params.delayed = 0
 
@@ -65,7 +66,7 @@ def xval(cpTableHead, xGrp, dataframe, params):
         temp.xstd = math.sqrt(temp.xstd - (temp.xrisk * temp.xrisk) / totalWt)
         temp = temp.forward
 
-    params.delayed = 1
+    params.delayed = prevDelayed
 
 
 '''

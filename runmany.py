@@ -4,6 +4,28 @@
 
 from pypart import *
 import sys
+import copy
+
+
+def copyTree(root):
+    iTree = copy.deepcopy(root)
+    if root.leftNode is not None:
+        copySubTree(root.leftNode, iTree.leftNode)
+    if root.rightNode is not None:
+        copySubTree(root.rightNode, iTree.leftNode)
+
+    return iTree
+
+'''
+    Recursive function to print the tree
+'''
+def copySubTree(node, iTree):
+    iTree = copy.deepcopy(node)
+    if node.leftNode is not None:
+        copySubTree(node.leftNode, iTree.leftNode)
+    if node.rightNode is not None:
+        copySubTree(node.rightNode, iTree.rightNode)
+
 
 '''
     Print usage
@@ -13,43 +35,41 @@ def usage():
     print("\tpython runmany.py <data file (csv/xlsx)> <response> <delayed value {0,1}> <number runs>")
 
 
-"""
-    Parse command line paramaters.
-"""
-def parseParams(argv):
-    filename = str(argv[1])
-    resp = argv[2]
-
-    delay = 0
-    if len(argv) > 3:
-        delay = argv[3]
-
-    if not (filename.endswith("csv") or filename.endswith("xlsx")):
-        print("\nData file must be of type 'csv' or 'xlsx'.")
-        print("Args: ", argv)
-        printUsage()
-        exit(0)
-
-    return filename, resp, int(delay)
-
-
 '''
     Runs the program.
 '''
 def run(iters, args):
+    datafilename, resp, delay = parseParams(args)
+    df = getDataFrameFromCSV(datafilename)
+    if not str(resp) in df.columns:
+        print("\nResponse variable not in data frame.")
+        print("Args: ", args)
+        usage()
+        exit(0)
+
+    # max node = 2^(d+1) - 1, where d = depth
+    maxDepth = 30
+    maxNodes = (2 ** (maxDepth + 1)) - 1
+    minObs = 20
+    minNode = 7
+    xVal = 10
+    params = Params(maxNodes, minObs, resp, minNode, maxDepth, delay, xVal, len(df))
+    tree = buildTree(df, params)
+
+    # run the cross validations and calc R^2 a set number of times
     avgR2 = 0
-    iters = int(iters)
     pruneCps = []
+    iters = int(iters)
     for i in range(iters):
+        iTree = copyTree(tree)
         print("\nIteration " + str(i) + " out of " + str(iters) + "...")
-        startTime = time.time()
-        cpTableHead = pypart_run(args)
         minXError = 9999999999
         minRelError = 99999999
         prunecp = 0
-        print("Time elapsed:", str(time.time() - startTime), "seconds.")
 
-        # TESTED: CPs are equal with rpart cps (if cp = 0.0 as param)
+        # do cross validations
+        cpTableHead = buildCpTable(iTree, params)
+
         # xrisk = xerror, risk = rel error, xstd = xstd
         tempCp = cpTableHead
         while tempCp is not None:
@@ -71,10 +91,9 @@ def run(iters, args):
 if __name__ == "__main__":
     start_time = time.time()
     if len(sys.argv) < 4:
-        printUsage()
+        usage()
         exit(0)
     iterations = sys.argv[len(sys.argv) - 1]
-    dataFilename, response, delayed = parseParams(sys.argv)
     r2, pruneCp = run(iterations, sys.argv[:-1])
 
     print("\nTotal Time elapsed:", str(time.time() - start_time), "seconds.")
