@@ -28,7 +28,7 @@ def bsplit(node, response, params):
         where, direction, split, improvement = AnovaSplitPoint(dataFrame, response, params.minNode, var)
 
         # first split, left = 'yes' in the tree
-        if direction < 0:       # < x go left -- swapped > with < after and the tree is EXACTLY like rparts
+        if direction < 0:       # < x go left -- swapped > with < after and the tree is EXACTLY like rpart's
             L1 = dataFrame[dataFrame[var] < split]
             L2 = dataFrame[dataFrame[var] >= split]
         else:                   # < x go right (> x go left)
@@ -36,7 +36,7 @@ def bsplit(node, response, params):
             L2 = dataFrame[dataFrame[var] <= split]
 
         if params.delayed > 0 and improvement > 0:
-            # create L3 and L4 from L1 and L5 and L6 from L2
+            # create L3 and L4 from L1 an d L5 and L6 from L2
             # split L1
             bestLeftSS = 9999999999
             bestRightSS = 9999999999
