@@ -27,9 +27,9 @@ Timings:
         
 Threaded:
     cars
-        1) 
-        2)
-        3)
+        1) worse
+        2) worse
+        3) ...
         4)
         5)
     cars delayed

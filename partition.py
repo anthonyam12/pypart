@@ -28,6 +28,17 @@ def partition(node, nodeNum, params):
         # find best split for the node
         left, right = bsplit(node, response, params)
 
+        if left is None or right is None:
+            # couldn't find a split worth doing...
+            # For the spam dataset (at least), we get to a point where all explanatories are the same but responses
+            # are different, this wasn't being handled properly.
+            node.leftNode = None
+            node.rightNode = None
+            node.yval = y.iloc[:, 0].mean()
+            node.dev = tempcp
+            node.cp = 0
+            return 0, tempcp
+
         # update 'where' list
         leftIndices = list(left.index)
         rightIndices = list(right.index)
