@@ -42,7 +42,7 @@ def bsplit(node, response, params):
             bestRightSS = 9999999999
             for var2 in xDf.columns:
                 L1 = L1.sort_values([var2])
-                whereL, directionL, splitL, improvementL = AnovaSplitPoint(L1, response, 2, var2)
+                whereL, directionL, splitL, improvementL = AnovaSplitPoint(L1, response, params.minNode, var2)
                 if directionL < 0:
                     L3 = L1[L1[var2] < splitL]
                     L4 = L1[L1[var2] >= splitL]
@@ -55,7 +55,7 @@ def bsplit(node, response, params):
                     bestLeftSS = thisSSLeft
 
                 L2 = L2.sort_values([var2])
-                whereR, directionR, splitR, improvementR = AnovaSplitPoint(L2, response, 2, var2)
+                whereR, directionR, splitR, improvementR = AnovaSplitPoint(L2, response, params.minNode, var2)
                 if directionR < 0:
                     L5 = L2[L2[var2] < splitR]
                     L6 = L2[L2[var2] >= splitR]
@@ -63,6 +63,10 @@ def bsplit(node, response, params):
                     L5 = L2[L2[var2] > splitR]
                     L6 = L2[L2[var2] <= splitR]
                 thisSSRight = AnovaSS(getResponseColumn(L5, response)) + AnovaSS(getResponseColumn(L6, response))
+
+#                if node.numObs == 96:
+#                    print("splitR\tdirectionR\timproveR\tsplitL\n\tdirectionL\timproveL")
+#                    print(var2, "\n\t", splitR, directionR, improvementR, "\n\t", splitL, directionL, improvementL)
 
                 if thisSSRight < bestRightSS and improvementR > 0:
                     bestRightSS = thisSSRight

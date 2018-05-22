@@ -78,4 +78,7 @@ def AnovaSplitPoint(dataFrame, response, minNode, varName):
         split = (x.iloc[where, 0] + x.iloc[where + 1, 0]) / 2
     else:
         split = x.iloc[where, 0]
+#    if len(dataFrame) == 96:
+#        print(where, split, improve)
+#        print(len(dataFrame), where, x.iloc[where, 0])
     return where, direction, split, improve
